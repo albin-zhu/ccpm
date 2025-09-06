@@ -1,112 +1,112 @@
 # Agents
 
-Specialized agents that do heavy work and return concise summaries to preserve context.
+专门的 agents 执行繁重工作并返回简洁摘要以保存 context。
 
-## Core Philosophy
+## 核心理念
 
-> “Don't anthropomorphize subagents. Use them to organize your prompts and elide context. Subagents are best when they can do lots of work but then provide small amounts of information back to the main conversation thread.”
+> "不要将 subagents 拟人化。使用它们来组织你的 prompts 并省略 context。Subagents 在能够做大量工作但只向主对话线程提供少量信息时效果最好。"
 >
 > – Adam Wolff, Anthropic
 
-## Available Agents
+## 可用 Agents
 
 ### 🔍 `code-analyzer`
-- **Purpose**: Hunt bugs across multiple files without polluting main context
-- **Pattern**: Search many files → Analyze code → Return bug report
-- **Usage**: When you need to trace logic flows, find bugs, or validate changes
-- **Returns**: Concise bug report with critical findings only
+- **目的**：在不污染主 context 的情况下跨多个文件寻找 bugs
+- **模式**：搜索多个文件 → 分析代码 → 返回 bug 报告
+- **使用场景**：当你需要追踪逻辑流、找 bugs 或验证更改时
+- **返回**：仅包含关键发现的简洁 bug 报告
 
 ### 📄 `file-analyzer`
-- **Purpose**: Read and summarize verbose files (logs, outputs, configs)
-- **Pattern**: Read files → Extract insights → Return summary
-- **Usage**: When you need to understand log files or analyze verbose output
-- **Returns**: Key findings and actionable insights (80-90% size reduction)
+- **目的**：读取和总结冗长文件（logs、outputs、configs）
+- **模式**：读取文件 → 提取见解 → 返回摘要
+- **使用场景**：当你需要理解 log 文件或分析冗长输出时
+- **返回**：关键发现和可操作见解（80-90% 大小减少）
 
 ### 🧪 `test-runner`
-- **Purpose**: Execute tests without dumping output to main thread
-- **Pattern**: Run tests → Capture to log → Analyze results → Return summary
-- **Usage**: When you need to run tests and understand failures
-- **Returns**: Test results summary with failure analysis
+- **目的**：执行测试而不将输出转储到主线程
+- **模式**：运行测试 → 捕获到 log → 分析结果 → 返回摘要
+- **使用场景**：当你需要运行测试并了解失败时
+- **返回**：带有失败分析的测试结果摘要
 
 ### 🔀 `parallel-worker`
-- **Purpose**: Coordinate multiple parallel work streams for an issue
-- **Pattern**: Read analysis → Spawn sub-agents → Consolidate results → Return summary
-- **Usage**: When executing parallel work streams in a worktree
-- **Returns**: Consolidated status of all parallel work
+- **目的**：为一个 issue 协调多个并行工作流
+- **模式**：读取分析 → spawn sub-agents → 合并结果 → 返回摘要
+- **使用场景**：在 worktree 中执行并行工作流时
+- **返回**：所有并行工作的合并状态
 
-## Why Agents?
+## 为什么使用 Agents？
 
-Agents are **context firewalls** that protect the main conversation from information overload:
+Agents 是**context 防火墙**，保护主对话免受信息过载：
 
 ```
-Without Agent:
-Main thread reads 10 files → Context explodes → Loses coherence
+没有 Agent：
+主线程读取10个文件 → Context 爆炸 → 失去连贯性
 
-With Agent:
-Agent reads 10 files → Main thread gets 1 summary → Context preserved
+有 Agent：
+Agent 读取10个文件 → 主线程获得1个摘要 → Context 保持
 ```
 
-## How Agents Preserve Context
+## Agents 如何保存 Context
 
-1. **Heavy Lifting** - Agents do the messy work (reading files, running tests, implementing features)
-2. **Context Isolation** - Implementation details stay in the agent, not the main thread
-3. **Concise Returns** - Only essential information returns to main conversation
-4. **Parallel Execution** - Multiple agents can work simultaneously without context collision
+1. **繁重工作** - Agents 做杂乱工作（读取文件、运行测试、实现功能）
+2. **Context 隔离** - 实现细节保留在 agent 中，不在主线程
+3. **简洁返回** - 只有重要信息返回到主对话
+4. **并行执行** - 多个 agents 可以同时工作而不会 context 冲突
 
-## Example Usage
+## 使用示例
 
 ```bash
-# Analyzing code for bugs
-Task: "Search for memory leaks in the codebase"
+# 分析代码查找 bugs
+Task: "搜索代码库中的内存泄漏"
 Agent: code-analyzer
-Returns: "Found 3 potential leaks: [concise list]"
-Main thread never sees: The hundreds of files examined
+Returns: "发现3个潜在泄漏：[简洁列表]"
+主线程永远看不到：检查的数百个文件
 
-# Running tests
-Task: "Run authentication tests"
+# 运行测试
+Task: "运行认证测试"
 Agent: test-runner
-Returns: "2/10 tests failed: [failure summary]"
-Main thread never sees: Verbose test output and logs
+Returns: "2/10 测试失败：[失败摘要]"
+主线程永远看不到：冗长的测试输出和 logs
 
-# Parallel implementation
-Task: "Implement issue #1234 with parallel streams"
+# 并行实现
+Task: "使用并行 streams 实现 issue #1234"
 Agent: parallel-worker
-Returns: "Completed 4/4 streams, 15 files modified"
-Main thread never sees: Individual implementation details
+Returns: "完成 4/4 streams，修改15个文件"
+主线程永远看不到：个别实现细节
 ```
 
-## Creating New Agents
+## 创建新 Agents
 
-New agents should follow these principles:
+新 agents 应遵循这些原则：
 
-1. **Single Purpose** - Each agent has one clear job
-2. **Context Reduction** - Return 10-20% of what you process
-3. **No Roleplay** - Agents aren't "experts", they're task executors
-4. **Clear Pattern** - Define input → processing → output pattern
-5. **Error Handling** - Gracefully handle failures and report clearly
+1. **单一目的** - 每个 agent 有一个明确工作
+2. **Context 减少** - 返回处理内容的 10-20%
+3. **无角色扮演** - Agents 不是"专家"，它们是任务执行者
+4. **清晰模式** - 定义输入 → 处理 → 输出模式
+5. **错误处理** - 优雅处理失败并清楚报告
 
-## Anti-Patterns to Avoid
+## 要避免的反模式
 
-❌ **Creating "specialist" agents** (database-expert, api-expert)
-   Agents don't have different knowledge - they're all the same model
+❌ **创建"专家" agents**（database-expert、api-expert）
+   Agents 没有不同知识 - 它们都是同一个 model
 
-❌ **Returning verbose output**
-   Defeats the purpose of context preservation
+❌ **返回冗长输出**
+   违背了 context 保存的目的
 
-❌ **Making agents communicate with each other**
-   Use a coordinator agent instead (like parallel-worker)
+❌ **让 agents 互相通信**
+   使用协调器 agent 代替（如 parallel-worker）
 
-❌ **Using agents for simple tasks**
-   Only use agents when context reduction is valuable
+❌ **对简单任务使用 agents**
+   只有当 context 减少有价值时才使用 agents
 
-## Integration with PM System
+## 与 PM System 集成
 
-Agents integrate seamlessly with the PM command system:
+Agents 与 PM 命令系统无缝集成：
 
-- `/pm:issue-analyze` → Identifies work streams
-- `/pm:issue-start` → Spawns parallel-worker agent
-- parallel-worker → Spawns multiple sub-agents
-- Sub-agents → Work in parallel in the worktree
-- Results → Consolidated back to main thread
+- `/pm:issue-analyze` → 识别工作流
+- `/pm:issue-start` → spawns parallel-worker agent
+- parallel-worker → spawns 多个 sub-agents
+- Sub-agents → 在 worktree 中并行工作
+- 结果 → 合并回主线程
 
-This creates a hierarchy that maximizes parallelism while preserving context at every level.
+这创建了一个层次结构，在每个级别最大化并行性的同时保存 context。

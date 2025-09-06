@@ -1,46 +1,46 @@
-# Frontmatter Operations Rule
+# Frontmatter Operations 规则
 
-Standard patterns for working with YAML frontmatter in markdown files.
+在 markdown 文件中使用 YAML frontmatter 的标准模式。
 
-## Reading Frontmatter
+## 读取 Frontmatter
 
-Extract frontmatter from any markdown file:
-1. Look for content between `---` markers at start of file
-2. Parse as YAML
-3. If invalid or missing, use sensible defaults
+从任何 markdown 文件提取 frontmatter：
+1. 在文件开始处寻找 `---` 标记之间的内容
+2. 解析为 YAML
+3. 如果无效或缺失，使用合理默认值
 
-## Updating Frontmatter
+## 更新 Frontmatter
 
-When updating existing files:
-1. Preserve all existing fields
-2. Only update specified fields
-3. Always update `updated` field with current datetime (see `/rules/datetime.md`)
+更新现有文件时：
+1. 保留所有现有字段
+2. 只更新指定字段
+3. 始终用当前 datetime 更新 `updated` 字段（参见 `/rules/datetime.md`）
 
-## Standard Fields
+## 标准字段
 
-### All Files
+### 所有文件
 ```yaml
 ---
 name: {identifier}
-created: {ISO datetime}      # Never change after creation
-updated: {ISO datetime}      # Update on any modification
+created: {ISO datetime}      # 创建后永不更改
+updated: {ISO datetime}      # 任何修改时更新
 ---
 ```
 
-### Status Values
-- PRDs: `backlog`, `in-progress`, `complete`
-- Epics: `backlog`, `in-progress`, `completed`  
-- Tasks: `open`, `in-progress`, `closed`
+### Status 值
+- PRDs：`backlog`、`in-progress`、`complete`
+- Epics：`backlog`、`in-progress`、`completed`  
+- Tasks：`open`、`in-progress`、`closed`
 
-### Progress Tracking
+### Progress 跟踪
 ```yaml
-progress: {0-100}%           # For epics
-completion: {0-100}%         # For progress files
+progress: {0-100}%           # 用于 epics
+completion: {0-100}%         # 用于 progress 文件
 ```
 
-## Creating New Files
+## 创建新文件
 
-Always include frontmatter when creating markdown files:
+创建 markdown 文件时始终包含 frontmatter：
 ```yaml
 ---
 name: {from_arguments_or_context}
@@ -50,9 +50,9 @@ updated: {current_datetime}
 ---
 ```
 
-## Important Notes
+## 重要说明
 
-- Never modify `created` field after initial creation
-- Always use real datetime from system (see `/rules/datetime.md`)
-- Validate frontmatter exists before trying to parse
-- Use consistent field names across all files
+- 初始创建后永不修改 `created` 字段
+- 始终使用系统的真实 datetime（参见 `/rules/datetime.md`）
+- 尝试解析前验证 frontmatter 存在
+- 在所有文件中使用一致的字段名称

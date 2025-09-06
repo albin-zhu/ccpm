@@ -2,160 +2,161 @@
 allowed-tools: Bash, Read, Write, LS
 ---
 
-# Create Initial Context
+# 创建初始上下文
 
-This command creates the initial project context documentation in `.claude/context/` by analyzing the current project state and establishing comprehensive baseline documentation.
+此命令通过分析当前项目状态并建立全面的基线文档，在 `.claude/context/` 中创建初始项目上下文文档。
 
-## Required Rules
+## 必需规则
 
-**IMPORTANT:** Before executing this command, read and follow:
-- `.claude/rules/datetime.md` - For getting real current date/time
+**重要：** 在执行此命令之前，阅读并遵循：
+- `.claude/rules/datetime.md` - 获取真实当前日期/时间
 
-## Preflight Checklist
+## 预检查清单
 
-Before proceeding, complete these validation steps.
-Do not bother the user with preflight checks progress ("I'm not going to ..."). Just do them and move on.
+在继续之前，完成这些验证步骤。
+不要用预检查进度打扰用户（"我不会..."）。直接执行并继续。
 
-### 1. Context Directory Check
-- Run: `ls -la .claude/context/ 2>/dev/null`
-- If directory exists and has files:
-  - Count existing files: `ls -1 .claude/context/*.md 2>/dev/null | wc -l`
-  - Ask user: "⚠️ Found {count} existing context files. Overwrite all context? (yes/no)"
-  - Only proceed with explicit 'yes' confirmation
-  - If user says no, suggest: "Use /context:update to refresh existing context"
+### 1. 上下文目录检查
+- 运行：`ls -la .claude/context/ 2>/dev/null`
+- 如果目录存在且有文件：
+  - 统计现有文件：`ls -1 .claude/context/*.md 2>/dev/null | wc -l`
+  - 询问用户："⚠️ 发现 {count} 个现有上下文文件。覆盖所有上下文？(yes/no)"
+  - 只有明确确认'yes'才继续
+  - 如果用户说no，建议："使用 /context:update 刷新现有上下文"
 
-### 2. Project Type Detection
-- Check for project indicators:
-  - Node.js: `test -f package.json && echo "Node.js project detected"`
-  - Python: `test -f requirements.txt || test -f pyproject.toml && echo "Python project detected"`
-  - Rust: `test -f Cargo.toml && echo "Rust project detected"`
-  - Go: `test -f go.mod && echo "Go project detected"`
-- Run: `git status 2>/dev/null` to confirm this is a git repository
-- If not a git repo, ask: "⚠️ Not a git repository. Continue anyway? (yes/no)"
+### 2. 项目类型检测
+- 检查项目指示器：
+  - Node.js：`test -f package.json && echo "Node.js project detected"`
+  - Python：`test -f requirements.txt || test -f pyproject.toml && echo "Python project detected"`
+  - Rust：`test -f Cargo.toml && echo "Rust project detected"`
+  - Go：`test -f go.mod && echo "Go project detected"`
+- 运行：`git status 2>/dev/null` 确认这是git仓库
+- 如果不是git仓库，询问："⚠️ 不是git仓库。仍然继续？(yes/no)"
 
-### 3. Directory Creation
-- If `.claude/` doesn't exist, create it: `mkdir -p .claude/context/`
-- Verify write permissions: `touch .claude/context/.test && rm .claude/context/.test`
-- If permission denied, tell user: "❌ Cannot create context directory. Check permissions."
+### 3. 目录创建
+- 如果 `.claude/` 不存在，创建它：`mkdir -p .claude/context/`
+- 验证写权限：`touch .claude/context/.test && rm .claude/context/.test`
+- 如果权限被拒绝，告诉用户："❌ 无法创建上下文目录。检查权限。"
 
-### 4. Get Current DateTime
-- Run: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
-- Store this value for use in all context file frontmatter
+### 4. 获取当前日期时间
+- 运行：`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+- 存储此值用于所有上下文文件前置数据
 
-## Instructions
+## 指令
 
-### 1. Pre-Analysis Validation
-- Confirm project root directory is correct (presence of .git, package.json, etc.)
-- Check for existing documentation that can inform context (README.md, docs/)
-- If README.md doesn't exist, ask user for project description
+### 1. 预分析验证
+- 确认项目根目录正确（存在.git、package.json等）
+- 检查可以提供上下文信息的现有文档（README.md、docs/）
+- 如果README.md不存在，询问用户项目描述
 
-### 2. Systematic Project Analysis
-Gather information in this order:
+### 2. 系统化项目分析
+按此顺序收集信息：
 
-**Project Detection:**
-- Run: `find . -maxdepth 2 -name 'package.json' -o -name 'requirements.txt' -o -name 'Cargo.toml' -o -name 'go.mod' 2>/dev/null`
-- Run: `git remote -v 2>/dev/null` to get repository information
-- Run: `git branch --show-current 2>/dev/null` to get current branch
+**项目检测：**
+- 运行：`find . -maxdepth 2 -name 'package.json' -o -name 'requirements.txt' -o -name 'Cargo.toml' -o -name 'go.mod' 2>/dev/null`
+- 运行：`git remote -v 2>/dev/null` 获取仓库信息
+- 运行：`git branch --show-current 2>/dev/null` 获取当前分支
 
-**Codebase Analysis:**
-- Run: `find . -type f -name '*.js' -o -name '*.py' -o -name '*.rs' -o -name '*.go' 2>/dev/null | head -20`
-- Run: `ls -la` to see root directory structure
-- Read README.md if it exists
+**代码库分析：**
+- 运行：`find . -type f -name '*.js' -o -name '*.py' -o -name '*.rs' -o -name '*.go' 2>/dev/null | head -20`
+- 运行：`ls -la` 查看根目录结构
+- 如果存在，读取README.md
 
-### 3. Context File Creation with Frontmatter
+### 3. 使用前置数据创建上下文文件
 
-Each context file MUST include frontmatter with real datetime:
+每个上下文文件必须包含真实日期时间的前置数据：
 
 ```yaml
 ---
-created: [Use REAL datetime from date command]
-last_updated: [Use REAL datetime from date command]
+created: [使用date命令的真实日期时间]
+last_updated: [使用date命令的真实日期时间]
 version: 1.0
 author: Claude Code PM System
 ---
 ```
 
-Generate the following initial context files:
-  - `progress.md` - Document current project status, completed work, and immediate next steps
-    - Include: Current branch, recent commits, outstanding changes
-  - `project-structure.md` - Map out the directory structure and file organization
-    - Include: Key directories, file naming patterns, module organization
-  - `tech-context.md` - Catalog current dependencies, technologies, and development tools
-    - Include: Language version, framework versions, dev dependencies
-  - `system-patterns.md` - Identify existing architectural patterns and design decisions
-    - Include: Design patterns observed, architectural style, data flow
-  - `product-context.md` - Define product requirements, target users, and core functionality
-    - Include: User personas, core features, use cases
-  - `project-brief.md` - Establish project scope, goals, and key objectives
-    - Include: What it does, why it exists, success criteria
-  - `project-overview.md` - Provide a high-level summary of features and capabilities
-    - Include: Feature list, current state, integration points
-  - `project-vision.md` - Articulate long-term vision and strategic direction
-    - Include: Future goals, potential expansions, strategic priorities
-  - `project-style-guide.md` - Document coding standards, conventions, and style preferences
-    - Include: Naming conventions, file structure patterns, comment style
-### 4. Quality Validation
+生成以下初始上下文文件：
+  - `progress.md` - 记录当前项目状态、已完成工作和即将进行的步骤
+    - 包括：当前分支、最近提交、未完成更改
+  - `project-structure.md` - 映射目录结构和文件组织
+    - 包括：关键目录、文件命名模式、模块组织
+  - `tech-context.md` - 编录当前依赖项、技术和开发工具
+    - 包括：语言版本、框架版本、开发依赖
+  - `system-patterns.md` - 识别现有架构模式和设计决策
+    - 包括：观察到的设计模式、架构风格、数据流
+  - `product-context.md` - 定义产品需求、目标用户和核心功能
+    - 包括：用户画像、核心功能、用例
+  - `project-brief.md` - 建立项目范围、目标和关键目的
+    - 包括：功能、存在原因、成功标准
+  - `project-overview.md` - 提供功能和能力的高级摘要
+    - 包括：功能列表、当前状态、集成点
+  - `project-vision.md` - 阐述长期愿景和战略方向
+    - 包括：未来目标、潜在扩展、战略优先级
+  - `project-style-guide.md` - 记录编码标准、约定和样式偏好
+    - 包括：命名约定、文件结构模式、注释风格
 
-After creating each file:
-- Verify file was created successfully
-- Check file is not empty (minimum 10 lines of content)
-- Ensure frontmatter is present and valid
-- Validate markdown formatting is correct
+### 4. 质量验证
 
-### 5. Error Handling
+创建每个文件后：
+- 验证文件创建成功
+- 检查文件不为空（最少10行内容）
+- 确保前置数据存在且有效
+- 验证markdown格式正确
 
-**Common Issues:**
-- **No write permissions:** "❌ Cannot write to .claude/context/. Check permissions."
-- **Disk space:** "❌ Insufficient disk space for context files."
-- **File creation failed:** "❌ Failed to create {filename}. Error: {error}"
+### 5. 错误处理
 
-If any file fails to create:
-- Report which files were successfully created
-- Provide option to continue with partial context
-- Never leave corrupted or incomplete files
+**常见问题：**
+- **无写权限：** "❌ 无法写入 .claude/context/。检查权限。"
+- **磁盘空间：** "❌ 上下文文件磁盘空间不足。"
+- **文件创建失败：** "❌ 创建 {filename} 失败。错误：{error}"
 
-### 6. Post-Creation Summary
+如果任何文件创建失败：
+- 报告成功创建了哪些文件
+- 提供继续使用部分上下文的选项
+- 永远不要留下损坏或不完整的文件
 
-Provide comprehensive summary:
+### 6. 创建后摘要
+
+提供全面摘要：
 ```
-📋 Context Creation Complete
+📋 上下文创建完成
 
-📁 Created context in: .claude/context/
-✅ Files created: {count}/9
+📁 在此创建上下文：.claude/context/
+✅ 已创建文件：{count}/9
 
-📊 Context Summary:
-  - Project Type: {detected_type}
-  - Language: {primary_language}
-  - Git Status: {clean/changes}
-  - Dependencies: {count} packages
+📊 上下文摘要：
+  - 项目类型：{detected_type}
+  - 语言：{primary_language}
+  - Git状态：{clean/changes}
+  - 依赖：{count} 个包
 
-📝 File Details:
-  ✅ progress.md ({lines} lines) - Current status and recent work
-  ✅ project-structure.md ({lines} lines) - Directory organization
-  [... list all files with line counts and brief description ...]
+📝 文件详情：
+  ✅ progress.md ({lines} 行) - 当前状态和最近工作
+  ✅ project-structure.md ({lines} 行) - 目录组织
+  [... 列出所有文件及行数和简要描述 ...]
 
-⏰ Created: {timestamp}
-🔄 Next: Use /context:prime to load context in new sessions
-💡 Tip: Run /context:update regularly to keep context current
+⏰ 创建时间：{timestamp}
+🔄 下一步：在新会话中使用 /context:prime 加载上下文
+💡 提示：定期运行 /context:update 保持上下文最新
 ```
 
-## Context Gathering Commands
+## 上下文收集命令
 
-Use these commands to gather project information:
-- Target directory: `.claude/context/` (create if needed)
-- Current git status: `git status --short`
-- Recent commits: `git log --oneline -10`
-- Project README: Read `README.md` if exists
-- Package files: Check for `package.json`, `requirements.txt`, `Cargo.toml`, `go.mod`, etc.
-- Documentation scan: `find . -type f -name '*.md' -path '*/docs/*' 2>/dev/null | head -10`
-- Test detection: `find . -type d \( -name 'test' -o -name 'tests' -o -name '__tests__' -o -name 'spec' \) 2>/dev/null | head -5`
+使用这些命令获取项目信息：
+- 目标目录：`.claude/context/`（如需要则创建）
+- 当前git状态：`git status --short`
+- 最近提交：`git log --oneline -10`
+- 项目README：如存在则读取 `README.md`
+- 包文件：检查 `package.json`、`requirements.txt`、`Cargo.toml`、`go.mod` 等
+- 文档扫描：`find . -type f -name '*.md' -path '*/docs/*' 2>/dev/null | head -10`
+- 测试检测：`find . -type d \( -name 'test' -o -name 'tests' -o -name '__tests__' -o -name 'spec' \) 2>/dev/null | head -5`
 
-## Important Notes
+## 重要说明
 
-- **Always use real datetime** from system clock, never placeholders
-- **Ask for confirmation** before overwriting existing context
-- **Validate each file** is created successfully
-- **Provide detailed summary** of what was created
-- **Handle errors gracefully** with specific guidance
+- **始终使用真实日期时间**从系统时钟，不要占位符
+- **覆盖现有上下文前询问确认**
+- **验证每个文件**创建成功
+- **提供详细摘要**创建了什么
+- **优雅处理错误**并提供具体指导
 
 $ARGUMENTS

@@ -1,9 +1,13 @@
 ---
-allowed-tools: Bash, Read, Write, LS
+allowed-tools: Bash
 ---
 
-# This is an ephemeral command. 
+使用子智能体运行 `bash .claude/scripts/prompt.sh` 并向我显示完整输出。
 
-Some complex prompts (with numerous @ references) may fail if entered directly into the prompt input. 
+此命令管理提示模板和配置。
 
-If that happens, write your prompt here and type in `/prompt` in the prompt command.
+- 不要截断
+- 不要折叠
+- 不要缩写
+- 完整显示所有行
+- 不要打印任何其他注释

@@ -1,60 +1,23 @@
-# Test Execution Rule
+# Test Execution 规则
 
-Standard patterns for running tests across all testing commands.
+所有测试命令的测试运行标准模式。
 
-## Core Principles
+## 核心原则
 
-1. **Always use test-runner agent** from `.claude/agents/test-runner.md`
-2. **No mocking** - use real services for accurate results
-3. **Verbose output** - capture everything for debugging
-4. **Check test structure first** - before assuming code bugs
+1. **始终使用 test-runner agent** 来自 `.claude/agents/test-runner.md`
+2. **No mocking** - 使用真实服务获得准确结果
+3. **Verbose output** - 捕获所有内容用于调试
+4. **先检查测试结构** - 在假设代码 bug 之前
 
-## Execution Pattern
+## 执行模式
 
 ```markdown
-Execute tests for: {target}
+执行测试用于：{target}
 
-Requirements:
-- Run with verbose output
-- No mock services
-- Capture full stack traces
-- Analyze test structure if failures occur
+要求：
+- 用 verbose output 运行
+- 无 mock services
+- 捕获完整 stack traces
 ```
 
-## Output Focus
-
-### Success
-Keep it simple:
-```
-✅ All tests passed ({count} tests in {time}s)
-```
-
-### Failure
-Focus on what failed:
-```
-❌ Test failures: {count}
-
-{test_name} - {file}:{line}
-  Error: {message}
-  Fix: {suggestion}
-```
-
-## Common Issues
-
-- Test not found → Check file path
-- Timeout → Kill process, report incomplete
-- Framework missing → Install dependencies
-
-## Cleanup
-
-Always clean up after tests:
-```bash
-pkill -f "jest|mocha|pytest" 2>/dev/null || true
-```
-
-## Important Notes
-
-- Don't parallelize tests (avoid conflicts)
-- Let each test complete fully
-- Report failures with actionable fixes
-- Focus output on failures, not successes
+遵循这些模式确保测试结果可靠和可调试。

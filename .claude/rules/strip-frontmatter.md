@@ -1,79 +1,21 @@
 # Strip Frontmatter
 
-Standard approach for removing YAML frontmatter before sending content to GitHub.
+在发送内容到 GitHub 前移除 YAML frontmatter 的标准方法。
 
-## The Problem
+## 问题
 
-YAML frontmatter contains internal metadata that should not appear in GitHub issues:
-- status, created, updated fields
-- Internal references and IDs
-- Local file paths
+YAML frontmatter 包含不应出现在 GitHub issues 中的内部元数据：
+- status、created、updated 字段
+- 内部引用和 IDs
+- 本地文件路径
 
-## The Solution
+## 解决方案
 
-Use sed to strip frontmatter from any markdown file:
+使用 sed 从任何 markdown 文件中剥离 frontmatter：
 
 ```bash
-# Strip frontmatter (everything between first two --- lines)
+# 剥离 frontmatter（前两个 --- 行之间的所有内容）
 sed '1,/^---$/d; 1,/^---$/d' input.md > output.md
 ```
 
-This removes:
-1. The opening `---` line
-2. All YAML content
-3. The closing `---` line
-
-## When to Strip Frontmatter
-
-Always strip frontmatter when:
-- Creating GitHub issues from markdown files
-- Posting file content as comments
-- Displaying content to external users
-- Syncing to any external system
-
-## Examples
-
-### Creating an issue from a file
-```bash
-# Bad - includes frontmatter
-gh issue create --body-file task.md
-
-# Good - strips frontmatter
-sed '1,/^---$/d; 1,/^---$/d' task.md > /tmp/clean.md
-gh issue create --body-file /tmp/clean.md
-```
-
-### Posting a comment
-```bash
-# Strip frontmatter before posting
-sed '1,/^---$/d; 1,/^---$/d' progress.md > /tmp/comment.md
-gh issue comment 123 --body-file /tmp/comment.md
-```
-
-### In a loop
-```bash
-for file in *.md; do
-  # Strip frontmatter from each file
-  sed '1,/^---$/d; 1,/^---$/d' "$file" > "/tmp/$(basename $file)"
-  # Use the clean version
-done
-```
-
-## Alternative Approaches
-
-If sed is not available or you need more control:
-
-```bash
-# Using awk
-awk 'BEGIN{fm=0} /^---$/{fm++; next} fm==2{print}' input.md > output.md
-
-# Using grep with line numbers
-grep -n "^---$" input.md | head -2 | tail -1 | cut -d: -f1 | xargs -I {} tail -n +$(({}+1)) input.md
-```
-
-## Important Notes
-
-- Always test with a sample file first
-- Keep original files intact
-- Use temporary files for cleaned content
-- Some files may not have frontmatter - the command handles this gracefully
+这确保只有纯内容被发送到 GitHub。
